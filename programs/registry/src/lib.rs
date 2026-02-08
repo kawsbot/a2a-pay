@@ -55,6 +55,13 @@ pub mod registry {
         msg!("Service deactivated by {}", service.owner);
         Ok(())
     }
+
+    pub fn close_service(ctx: Context<CloseService>) -> Result<()> {
+        let service = &ctx.accounts.service_account;
+        require!(!service.is_active, RegistryError::ServiceStillActive);
+        msg!("Service closed by {}", service.owner);
+        Ok(())
+    }
 }
 
 // -- Accounts structs --
@@ -79,6 +86,19 @@ pub struct RegisterService<'info> {
 pub struct UpdateService<'info> {
     #[account(
         mut,
+        has_one = owner,
+        seeds = [b"service", owner.key().as_ref(), service_account.service_type.as_bytes()],
+        bump,
+    )]
+    pub service_account: Account<'info, ServiceAccount>,
+    pub owner: Signer<'info>,
+}
+
+#[derive(Accounts)]
+pub struct CloseService<'info> {
+    #[account(
+        mut,
+        close = owner,
         has_one = owner,
         seeds = [b"service", owner.key().as_ref(), service_account.service_type.as_bytes()],
         bump,
@@ -123,4 +143,6 @@ pub enum RegistryError {
     EndpointTooLong,
     #[msg("Price must be greater than zero")]
     InvalidPrice,
+    #[msg("Service must be deactivated before closing")]
+    ServiceStillActive,
 }

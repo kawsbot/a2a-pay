@@ -64,9 +64,15 @@ pub mod escrow {
         );
 
         let amount = escrow.amount;
+        let escrow_lamports = escrow.to_account_info().lamports();
+        require!(
+            escrow_lamports >= amount,
+            EscrowError::InsufficientEscrowBalance
+        );
         escrow.status = EscrowStatus::Released;
 
-        // Transfer from escrow PDA to provider
+        // Direct mutation is used because the escrow account is PDA-owned.
+        // A system transfer would require invoke_signed with PDA seeds.
         **escrow.to_account_info().try_borrow_mut_lamports()? -= amount;
         **ctx
             .accounts
@@ -87,9 +93,15 @@ pub mod escrow {
         );
 
         let amount = escrow.amount;
+        let escrow_lamports = escrow.to_account_info().lamports();
+        require!(
+            escrow_lamports >= amount,
+            EscrowError::InsufficientEscrowBalance
+        );
         escrow.status = EscrowStatus::Disputed;
 
-        // Refund client
+        // Direct mutation is used because the escrow account is PDA-owned.
+        // A system transfer would require invoke_signed with PDA seeds.
         **escrow.to_account_info().try_borrow_mut_lamports()? -= amount;
         **ctx
             .accounts
@@ -148,6 +160,7 @@ pub struct ProviderAction<'info> {
 pub struct ClientAction<'info> {
     #[account(
         mut,
+        close = client,
         has_one = client,
         seeds = [
             b"escrow",
@@ -207,4 +220,6 @@ pub enum EscrowError {
     InvalidAmount,
     #[msg("Invalid escrow status for this operation")]
     InvalidStatus,
+    #[msg("Escrow account has insufficient balance")]
+    InsufficientEscrowBalance,
 }

@@ -105,8 +105,9 @@ export class A2AClient {
     if (serviceType) {
       // Filter by service_type string field
       // Offset: 8 (discriminator) + 32 (owner) + 4 (string len prefix) = 44
-      const serviceTypeBuffer = Buffer.alloc(4 + serviceType.length);
-      serviceTypeBuffer.writeUInt32LE(serviceType.length, 0);
+      const serviceTypeByteLength = Buffer.byteLength(serviceType, "utf8");
+      const serviceTypeBuffer = Buffer.alloc(4 + serviceTypeByteLength);
+      serviceTypeBuffer.writeUInt32LE(serviceTypeByteLength, 0);
       serviceTypeBuffer.write(serviceType, 4);
       filters.push({
         memcmp: {
