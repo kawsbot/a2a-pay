@@ -6,7 +6,10 @@
     "build:sdk": "cd sdk && npm run build",
     "build:cli": "cd cli && npm run build",
     "build:all": "npm run build:sdk && npm run build:cli",
-    "cli": "cd cli && npx ts-node src/index.ts"
+    "cli": "cd cli && npx ts-node src/index.ts",
+    "demo": "cd demo && npx ts-node run-demo.ts",
+    "demo:provider": "cd demo && npx ts-node provider-agent.ts",
+    "demo:client": "cd demo && npx ts-node client-agent.ts"
   },
   "dependencies": {
     "@coral-xyz/anchor": "^0.32.1"
