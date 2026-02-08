@@ -2,7 +2,11 @@
   "license": "ISC",
   "scripts": {
     "lint:fix": "prettier */*.js \"*/**/*{.js,.ts}\" -w",
-    "lint": "prettier */*.js \"*/**/*{.js,.ts}\" --check"
+    "lint": "prettier */*.js \"*/**/*{.js,.ts}\" --check",
+    "build:sdk": "cd sdk && npm run build",
+    "build:cli": "cd cli && npm run build",
+    "build:all": "npm run build:sdk && npm run build:cli",
+    "cli": "cd cli && npx ts-node src/index.ts"
   },
   "dependencies": {
     "@coral-xyz/anchor": "^0.32.1"
