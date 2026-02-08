@@ -21,8 +21,8 @@ a2a-pay/
 │   └── escrow/      # Payment escrow (create, complete, release, dispute)
 ├── sdk/             # TypeScript SDK with A2AClient class
 ├── cli/             # CLI for testing
-├── demo/            # Demo agents (to be built)
-└── docs/            # Documentation (to be built)
+├── demo/            # Demo agents
+└── docs/            # Project documentation
 ```
 
 ## Completed
@@ -33,22 +33,17 @@ a2a-pay/
 - [x] CLI with register, discover, pay, status, balance commands
 - [x] Pushed to GitHub
 
-## Next Steps
-1. Deploy to devnet
-2. Test with CLI
-3. Build demo agents (provider + client)
-4. Create docs and presentation materials
-5. Post progress to hackathon forum
-
-## Secrets Location
-~/hackathon/.secrets/keys.env contains:
-- ANTHROPIC_API_KEY
-- HACKATHON_API_KEY
+## Current Status
+- Deployed to Solana devnet
+- Expanded registry + escrow test coverage passing on devnet
+- Demo flow implemented and runnable from `npm run demo`
+- CLI and SDK updated for nonce-based escrow PDAs
 
 ## Key Commands
 ```bash
-source ~/hackathon/.secrets/keys.env
 export PATH="$HOME/.npm-global/bin:$HOME/.local/share/solana/install/active_release/bin:$HOME/.cargo/bin:$PATH"
 cd ~/hackathon/a2a-pay
 anchor build
+anchor test --skip-build
+npm run demo
 ```

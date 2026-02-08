@@ -29,7 +29,7 @@ npm run demo
 The demo runs a complete agent-to-agent payment cycle using a single wallet (simulating two agents):
 
 ### Step 1: Provider Registration
-The provider agent registers an "echo" service on-chain:
+The provider agent registers an "echo" service on-chain (or reuses it if already registered):
 - Service type: `echo`
 - Price: 500,000 lamports (0.0005 SOL)
 - Endpoint: `https://kawsbot.dev/api/echo`
@@ -91,6 +91,7 @@ Balance: 4.5 SOL
 [Client] Found 1 service(s)
 [Client] Creating escrow payment...
 [Client] Escrow created! TX: 3nR...
+[Client] Nonce: 1770577836007
 
 --- Step 3: Provider Completes Service ---
 [Provider] Found escrow! Amount: 500000 lamports

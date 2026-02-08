@@ -27,6 +27,7 @@ Wallet: 986uMPZJLDPWJCFRUMb34cdVTnNWWmUwanhDoF36NwXA
 [Client] Price: 500000 lamports
 [Client] Creating escrow payment...
 [Client] Escrow created! TX: 2PvtvyaYDgw38VEdgVqwnhYzJ64BWhVL3MRcLFspnaCfrxGhp3jntkoSy266uWCQwt8GDRhw7VgyFqBJA8iw9vzk
+[Client] Nonce: 1770577836007
 
 --- Step 3: Provider Completes Service ---
 [Provider] Checking for escrow from 986uMPZJLDPWJCFRUMb34cdVTnNWWmUwanhDoF36NwXA...
