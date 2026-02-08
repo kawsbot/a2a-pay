@@ -5,13 +5,13 @@ package_manager = "yarn"
 resolution = true
 skip-lint = false
 
-[programs.localnet]
-registry = "CywQ7eaRAFcn2VAxKc2SxGMER2rVu48jfzLyc7oUz9iy"
-escrow = "7SK6C96UZz3RH9pZ8vJWtPDCBnPrE7k166EXtd9grYYw"
-
 [programs.devnet]
-registry = "CywQ7eaRAFcn2VAxKc2SxGMER2rVu48jfzLyc7oUz9iy"
-escrow = "7SK6C96UZz3RH9pZ8vJWtPDCBnPrE7k166EXtd9grYYw"
+escrow = "CPqN9DNQqXPcfgXaWyTTXoGMxUF2zWGaBkdMAfnf52gR"
+registry = "Eb3aQMBNatFAoMRWMy1B12mDbo7jPPvhXTsEQ7fX2f21"
+
+[programs.localnet]
+escrow = "CPqN9DNQqXPcfgXaWyTTXoGMxUF2zWGaBkdMAfnf52gR"
+registry = "Eb3aQMBNatFAoMRWMy1B12mDbo7jPPvhXTsEQ7fX2f21"
 
 [registry]
 url = "https://api.apr.dev"

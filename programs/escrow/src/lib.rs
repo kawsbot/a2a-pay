@@ -1,7 +1,7 @@
 use anchor_lang::prelude::*;
 use anchor_lang::system_program;
 
-declare_id!("7SK6C96UZz3RH9pZ8vJWtPDCBnPrE7k166EXtd9grYYw");
+declare_id!("CPqN9DNQqXPcfgXaWyTTXoGMxUF2zWGaBkdMAfnf52gR");
 
 #[program]
 pub mod escrow {

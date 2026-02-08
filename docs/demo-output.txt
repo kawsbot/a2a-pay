@@ -1,0 +1,49 @@
+========================================
+  A2A Pay - Agent Payment Demo
+========================================
+
+Wallet: 986uMPZJLDPWJCFRUMb34cdVTnNWWmUwanhDoF36NwXA
+Balance: 6.36160088 SOL
+
+--- Step 1: Provider Registration ---
+
+=== PROVIDER AGENT ===
+Wallet: 986uMPZJLDPWJCFRUMb34cdVTnNWWmUwanhDoF36NwXA
+
+[Provider] Registering "echo" service at 500000 lamports...
+[Provider] Registered! TX: 4bQpt1xU2d1vKUg71EdWeC6NmmqHGpDuRYfbpKGkJBoHXnG4XxNPrsovepJYPGgxevBnFxjJuCvkkjRwkotVK1tG
+[Provider] Waiting for incoming escrows...
+
+--- Step 2: Client Discovery & Payment ---
+
+=== CLIENT AGENT ===
+Wallet: 986uMPZJLDPWJCFRUMb34cdVTnNWWmUwanhDoF36NwXA
+
+[Client] Discovering "echo" services...
+[Client] Found 1 service(s):
+  - Owner: 986uMPZJLDPWJCFRUMb34cdVTnNWWmUwanhDoF36NwXA, Price: 500000 lamports
+
+[Client] Selected cheapest provider: 986uMPZJLDPWJCFRUMb34cdVTnNWWmUwanhDoF36NwXA
+[Client] Price: 500000 lamports
+[Client] Creating escrow payment...
+[Client] Escrow created! TX: 2PvtvyaYDgw38VEdgVqwnhYzJ64BWhVL3MRcLFspnaCfrxGhp3jntkoSy266uWCQwt8GDRhw7VgyFqBJA8iw9vzk
+
+--- Step 3: Provider Completes Service ---
+[Provider] Checking for escrow from 986uMPZJLDPWJCFRUMb34cdVTnNWWmUwanhDoF36NwXA...
+[Provider] Found escrow! Amount: 500000 lamports
+[Provider] Status: Created
+[Provider] Performing echo service... (simulated)
+[Provider] Service complete. Marking as delivered...
+[Provider] Marked delivered! TX: eGzknJZLzouoCTNKN5YDaAK2rWg9snpGN5EZPR1dHiUpbUkKaeuwWpksmZf3K9BwdfbzvYMR3a2rLzuGZ9gZnk1
+
+--- Step 4: Client Releases Payment ---
+[Client] Checking escrow status...
+[Client] Escrow status: Delivered
+[Client] Service delivered! Releasing payment...
+[Client] Payment released! TX: 3kY3suR7yqZ9eSmBtgGe69cGpPHW98fMTWZRtcBsBxbKuJvgdrzidy18dmRQ2TZAdv2n92DvyFvxS2b5txUKFRUZ
+
+========================================
+  Demo Complete!
+========================================
+Final balance: 6.3576972 SOL
+Cost: 0.00390368 SOL (tx fees + rent)

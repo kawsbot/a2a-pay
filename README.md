@@ -33,8 +33,8 @@ Provider Agent                          Client Agent
 
 | Program | Address |
 |---------|---------|
-| Registry | `CywQ7eaRAFcn2VAxKc2SxGMER2rVu48jfzLyc7oUz9iy` |
-| Escrow | `7SK6C96UZz3RH9pZ8vJWtPDCBnPrE7k166EXtd9grYYw` |
+| Registry | `Eb3aQMBNatFAoMRWMy1B12mDbo7jPPvhXTsEQ7fX2f21` |
+| Escrow | `CPqN9DNQqXPcfgXaWyTTXoGMxUF2zWGaBkdMAfnf52gR` |
 
 ## Quick Start
 
