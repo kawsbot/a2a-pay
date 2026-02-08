@@ -14,15 +14,22 @@
  * would have its own keypair.
  */
 
-import { Keypair, Connection, clusterApiUrl, LAMPORTS_PER_SOL } from "@solana/web3.js";
+import {
+  Keypair,
+  Connection,
+  clusterApiUrl,
+  LAMPORTS_PER_SOL,
+} from "@solana/web3.js";
 import { readFileSync } from "fs";
 import { resolve } from "path";
-import { connectToDevnet, walletFromKeypair } from "@a2a-pay/sdk";
 import { runProvider, waitForEscrowAndComplete } from "./provider-agent";
 import { runClient, releaseAfterDelivery } from "./client-agent";
 
 function loadKeypair(): Keypair {
-  const keypairPath = resolve(process.env.HOME || "~", ".config/solana/id.json");
+  const keypairPath = resolve(
+    process.env.HOME || "~",
+    ".config/solana/id.json"
+  );
   const secret = JSON.parse(readFileSync(keypairPath, "utf-8"));
   return Keypair.fromSecretKey(Uint8Array.from(secret));
 }
@@ -50,15 +57,15 @@ async function main() {
 
   // Step 2: Client discovers and pays
   console.log("\n--- Step 2: Client Discovery & Payment ---");
-  const { provider } = await runClient();
+  const { provider, nonce } = await runClient();
 
   // Step 3: Provider completes service
   console.log("\n--- Step 3: Provider Completes Service ---");
-  await waitForEscrowAndComplete(keypair.publicKey);
+  await waitForEscrowAndComplete(keypair.publicKey, nonce);
 
   // Step 4: Client releases payment
   console.log("\n--- Step 4: Client Releases Payment ---");
-  await releaseAfterDelivery(provider);
+  await releaseAfterDelivery(provider, nonce);
 
   // Final status
   const finalBalance = await connection.getBalance(keypair.publicKey);
@@ -66,7 +73,9 @@ async function main() {
   console.log("  Demo Complete!");
   console.log("========================================");
   console.log(`Final balance: ${finalBalance / LAMPORTS_PER_SOL} SOL`);
-  console.log(`Cost: ${(balance - finalBalance) / LAMPORTS_PER_SOL} SOL (tx fees + rent)`);
+  console.log(
+    `Cost: ${(balance - finalBalance) / LAMPORTS_PER_SOL} SOL (tx fees + rent)`
+  );
 }
 
 main().catch((err) => {

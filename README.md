@@ -97,13 +97,14 @@ await client.registerService("translation", new BN(100000), "https://my-agent.de
 const services = await client.discoverServices("translation");
 
 // Create escrow payment
-await client.createEscrow(providerPubkey, "translation", new BN(100000));
+const nonce = new BN(Date.now());
+await client.createEscrow(providerPubkey, "translation", new BN(100000), nonce);
 
 // Provider marks complete
-await client.completeService(clientPubkey, "translation");
+await client.completeService(clientPubkey, "translation", nonce);
 
 // Client releases payment
-await client.releasePayment(providerPubkey, "translation");
+await client.releasePayment(providerPubkey, "translation", nonce);
 ```
 
 ## CLI Commands
@@ -113,7 +114,7 @@ await client.releasePayment(providerPubkey, "translation");
 | `npm run cli -- register <type> <price> <endpoint>` | Register a service |
 | `npm run cli -- discover [type]` | Find services |
 | `npm run cli -- pay <provider> <type> <amount>` | Create escrow |
-| `npm run cli -- status <provider> <type>` | Check escrow |
+| `npm run cli -- status <provider> <type> <nonce>` | Check escrow |
 | `npm run cli -- balance` | Show wallet balance |
 
 ## Demo
@@ -123,6 +124,8 @@ See [docs/DEMO.md](docs/DEMO.md) for detailed demo instructions.
 ```bash
 npm run demo
 ```
+
+Each escrow now uses a unique nonce seed, so repeated demo runs do not collide on the same escrow PDA.
 
 ## Architecture
 

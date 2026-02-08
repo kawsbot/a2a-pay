@@ -4,12 +4,12 @@
     "lint:fix": "prettier */*.js \"*/**/*{.js,.ts}\" -w",
     "lint": "prettier */*.js \"*/**/*{.js,.ts}\" --check",
     "build:sdk": "cd sdk && npm run build",
-    "build:cli": "cd cli && npm run build",
+    "build:cli": "npm run build:sdk && cd cli && npm run build",
     "build:all": "npm run build:sdk && npm run build:cli",
-    "cli": "cd cli && npx ts-node src/index.ts",
-    "demo": "cd demo && npx ts-node run-demo.ts",
-    "demo:provider": "cd demo && npx ts-node provider-agent.ts",
-    "demo:client": "cd demo && npx ts-node client-agent.ts"
+    "cli": "npm run build:sdk && cd cli && npx ts-node src/index.ts",
+    "demo": "npm run build:sdk && cd demo && npx ts-node run-demo.ts",
+    "demo:provider": "npm run build:sdk && cd demo && npx ts-node provider-agent.ts",
+    "demo:client": "npm run build:sdk && cd demo && npx ts-node client-agent.ts"
   },
   "dependencies": {
     "@coral-xyz/anchor": "^0.32.1"
@@ -18,7 +18,6 @@
     "chai": "^4.3.4",
     "mocha": "^9.0.3",
     "ts-mocha": "^10.0.0",
-    "@types/bn.js": "^5.1.0",
     "@types/chai": "^4.3.0",
     "@types/mocha": "^9.0.0",
     "typescript": "^5.7.3",

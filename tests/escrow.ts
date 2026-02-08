@@ -16,6 +16,7 @@ describe("escrow", () => {
 
   const serviceType = `translation-${Date.now()}`;
   const amount = new anchor.BN(100_000_000); // 0.1 SOL
+  const nonce = new anchor.BN(Date.now());
 
   let escrowPda: anchor.web3.PublicKey;
 
@@ -26,6 +27,7 @@ describe("escrow", () => {
         client.publicKey.toBuffer(),
         serviceProvider.publicKey.toBuffer(),
         Buffer.from(serviceType),
+        nonce.toArrayLike(Buffer, "le", 8),
       ],
       program.programId
     );
@@ -33,7 +35,7 @@ describe("escrow", () => {
 
   it("creates an escrow", async () => {
     const tx = await program.methods
-      .createEscrow(serviceType, amount)
+      .createEscrow(serviceType, amount, nonce)
       .accounts({
         escrowAccount: escrowPda,
         client: client.publicKey,
@@ -46,7 +48,10 @@ describe("escrow", () => {
 
     const account = await program.account.escrowAccount.fetch(escrowPda);
     assert.equal(account.client.toBase58(), client.publicKey.toBase58());
-    assert.equal(account.provider.toBase58(), serviceProvider.publicKey.toBase58());
+    assert.equal(
+      account.provider.toBase58(),
+      serviceProvider.publicKey.toBase58()
+    );
     assert.equal(account.amount.toNumber(), amount.toNumber());
     assert.equal(account.serviceType, serviceType);
     assert.deepEqual(account.status, { created: {} });
@@ -84,8 +89,7 @@ describe("escrow", () => {
 
     console.log("  release_payment tx:", tx);
 
-    const account = await program.account.escrowAccount.fetch(escrowPda);
-    assert.deepEqual(account.status, { released: {} });
+    await assertEscrowClosed(escrowPda);
 
     const providerBalanceAfter = await provider.connection.getBalance(
       serviceProvider.publicKey
@@ -100,6 +104,7 @@ describe("escrow", () => {
   describe("dispute flow", () => {
     const serviceType2 = `summarize-${Date.now()}`;
     const disputeAmount = new anchor.BN(50_000_000); // 0.05 SOL
+    const nonce2 = new anchor.BN(Date.now() + 1);
     const provider2 = anchor.web3.Keypair.generate();
     let escrowPda2: anchor.web3.PublicKey;
 
@@ -110,6 +115,7 @@ describe("escrow", () => {
           client.publicKey.toBuffer(),
           provider2.publicKey.toBuffer(),
           Buffer.from(serviceType2),
+          nonce2.toArrayLike(Buffer, "le", 8),
         ],
         program.programId
       );
@@ -118,7 +124,7 @@ describe("escrow", () => {
     it("creates escrow and disputes for refund", async () => {
       // Create
       await program.methods
-        .createEscrow(serviceType2, disputeAmount)
+        .createEscrow(serviceType2, disputeAmount, nonce2)
         .accounts({
           escrowAccount: escrowPda2,
           client: client.publicKey,
@@ -143,8 +149,7 @@ describe("escrow", () => {
 
       console.log("  dispute tx:", tx);
 
-      const account = await program.account.escrowAccount.fetch(escrowPda2);
-      assert.deepEqual(account.status, { disputed: {} });
+      await assertEscrowClosed(escrowPda2);
 
       const clientBalanceAfter = await provider.connection.getBalance(
         client.publicKey
@@ -153,4 +158,16 @@ describe("escrow", () => {
       assert.isTrue(clientBalanceAfter > clientBalanceBefore);
     });
   });
+
+  async function assertEscrowClosed(
+    escrowAddress: anchor.web3.PublicKey
+  ): Promise<void> {
+    try {
+      await program.account.escrowAccount.fetch(escrowAddress);
+      assert.fail("escrow account should be closed");
+    } catch (err: any) {
+      const message = `${err?.message || err}`;
+      assert.include(message, "Account does not exist or has no data");
+    }
+  }
 });

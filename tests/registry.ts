@@ -39,7 +39,9 @@ describe("registry", () => {
 
     console.log("  register_service tx:", tx);
 
-    const account = await program.account.serviceAccount.fetch(serviceAccountPda);
+    const account = await program.account.serviceAccount.fetch(
+      serviceAccountPda
+    );
     assert.equal(account.owner.toBase58(), owner.publicKey.toBase58());
     assert.equal(account.serviceType, serviceType);
     assert.equal(account.price.toNumber(), price.toNumber());
@@ -62,7 +64,9 @@ describe("registry", () => {
 
     console.log("  update_service tx:", tx);
 
-    const account = await program.account.serviceAccount.fetch(serviceAccountPda);
+    const account = await program.account.serviceAccount.fetch(
+      serviceAccountPda
+    );
     assert.equal(account.price.toNumber(), newPrice.toNumber());
     assert.equal(account.endpoint, newEndpoint);
   });
@@ -78,7 +82,9 @@ describe("registry", () => {
 
     console.log("  deactivate_service tx:", tx);
 
-    const account = await program.account.serviceAccount.fetch(serviceAccountPda);
+    const account = await program.account.serviceAccount.fetch(
+      serviceAccountPda
+    );
     assert.equal(account.isActive, false);
   });
 });

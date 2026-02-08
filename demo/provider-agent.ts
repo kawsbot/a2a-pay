@@ -1,24 +1,31 @@
 #!/usr/bin/env npx ts-node
 
-import { Keypair, Connection, clusterApiUrl, PublicKey } from "@solana/web3.js";
-import * as anchor from "@coral-xyz/anchor";
+import { Keypair, PublicKey } from "@solana/web3.js";
 import { readFileSync } from "fs";
 import { resolve } from "path";
 import BN from "bn.js";
-import { A2AClient, connectToDevnet, walletFromKeypair, escrowStatusToString } from "@a2a-pay/sdk";
+import {
+  connectToDevnet,
+  walletFromKeypair,
+  escrowStatusToString,
+} from "@a2a-pay/sdk";
 
 const SERVICE_TYPE = "echo";
 const PRICE = 500_000; // lamports
 const ENDPOINT = "https://kawsbot.dev/api/echo";
-const POLL_INTERVAL = 3000; // ms
-
 function loadKeypair(): Keypair {
-  const keypairPath = resolve(process.env.HOME || "~", ".config/solana/id.json");
+  const keypairPath = resolve(
+    process.env.HOME || "~",
+    ".config/solana/id.json"
+  );
   const secret = JSON.parse(readFileSync(keypairPath, "utf-8"));
   return Keypair.fromSecretKey(Uint8Array.from(secret));
 }
 
-export async function runProvider(): Promise<{ registered: boolean; completed: boolean }> {
+export async function runProvider(): Promise<{
+  registered: boolean;
+  completed: boolean;
+}> {
   const keypair = loadKeypair();
   const wallet = walletFromKeypair(keypair);
   const client = connectToDevnet(wallet);
@@ -27,9 +34,15 @@ export async function runProvider(): Promise<{ registered: boolean; completed: b
   console.log(`Wallet: ${client.wallet.toBase58()}`);
 
   // Step 1: Register the echo service
-  console.log(`\n[Provider] Registering "${SERVICE_TYPE}" service at ${PRICE} lamports...`);
+  console.log(
+    `\n[Provider] Registering "${SERVICE_TYPE}" service at ${PRICE} lamports...`
+  );
   try {
-    const tx = await client.registerService(SERVICE_TYPE, new BN(PRICE), ENDPOINT);
+    const tx = await client.registerService(
+      SERVICE_TYPE,
+      new BN(PRICE),
+      ENDPOINT
+    );
     console.log(`[Provider] Registered! TX: ${tx}`);
   } catch (err: any) {
     if (err.message?.includes("already in use")) {
@@ -44,19 +57,31 @@ export async function runProvider(): Promise<{ registered: boolean; completed: b
   return { registered: true, completed: false };
 }
 
-export async function waitForEscrowAndComplete(clientPubkey: PublicKey): Promise<string> {
+export async function waitForEscrowAndComplete(
+  clientPubkey: PublicKey,
+  nonce: BN
+): Promise<string> {
   const keypair = loadKeypair();
   const wallet = walletFromKeypair(keypair);
   const client = connectToDevnet(wallet);
 
-  console.log(`[Provider] Checking for escrow from ${clientPubkey.toBase58()}...`);
+  console.log(
+    `[Provider] Checking for escrow from ${clientPubkey.toBase58()}...`
+  );
 
-  const escrow = await client.getEscrow(clientPubkey, client.wallet, SERVICE_TYPE);
+  const escrow = await client.getEscrow(
+    clientPubkey,
+    client.wallet,
+    SERVICE_TYPE,
+    nonce
+  );
   if (!escrow) {
     throw new Error("No escrow found");
   }
 
-  console.log(`[Provider] Found escrow! Amount: ${escrow.amount.toString()} lamports`);
+  console.log(
+    `[Provider] Found escrow! Amount: ${escrow.amount.toString()} lamports`
+  );
   console.log(`[Provider] Status: ${escrowStatusToString(escrow.status)}`);
 
   if ("created" in escrow.status) {
@@ -64,7 +89,7 @@ export async function waitForEscrowAndComplete(clientPubkey: PublicKey): Promise
     await new Promise((r) => setTimeout(r, 1000));
     console.log("[Provider] Service complete. Marking as delivered...");
 
-    const tx = await client.completeService(clientPubkey, SERVICE_TYPE);
+    const tx = await client.completeService(clientPubkey, SERVICE_TYPE, nonce);
     console.log(`[Provider] Marked delivered! TX: ${tx}`);
     return tx;
   }

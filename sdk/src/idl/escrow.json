@@ -49,6 +49,11 @@
                 "kind": "account",
                 "path": "escrow_account.service_type",
                 "account": "EscrowAccount"
+              },
+              {
+                "kind": "account",
+                "path": "escrow_account.nonce",
+                "account": "EscrowAccount"
               }
             ]
           }
@@ -103,6 +108,10 @@
               {
                 "kind": "arg",
                 "path": "service_type"
+              },
+              {
+                "kind": "arg",
+                "path": "nonce"
               }
             ]
           }
@@ -127,6 +136,10 @@
         },
         {
           "name": "amount",
+          "type": "u64"
+        },
+        {
+          "name": "nonce",
           "type": "u64"
         }
       ]
@@ -172,6 +185,11 @@
               {
                 "kind": "account",
                 "path": "escrow_account.service_type",
+                "account": "EscrowAccount"
+              },
+              {
+                "kind": "account",
+                "path": "escrow_account.nonce",
                 "account": "EscrowAccount"
               }
             ]
@@ -234,6 +252,11 @@
                 "kind": "account",
                 "path": "escrow_account.service_type",
                 "account": "EscrowAccount"
+              },
+              {
+                "kind": "account",
+                "path": "escrow_account.nonce",
+                "account": "EscrowAccount"
               }
             ]
           }
@@ -284,6 +307,11 @@
       "code": 6002,
       "name": "InvalidStatus",
       "msg": "Invalid escrow status for this operation"
+    },
+    {
+      "code": 6003,
+      "name": "InsufficientEscrowBalance",
+      "msg": "Escrow account has insufficient balance"
     }
   ],
   "types": [
@@ -315,6 +343,10 @@
           {
             "name": "service_type",
             "type": "string"
+          },
+          {
+            "name": "nonce",
+            "type": "u64"
           },
           {
             "name": "created_at",

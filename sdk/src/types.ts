@@ -17,6 +17,7 @@ export interface EscrowAccount {
   amount: BN;
   status: EscrowStatus;
   serviceType: string;
+  nonce: BN;
   createdAt: BN;
 }
 

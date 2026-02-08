@@ -1,11 +1,21 @@
 #!/usr/bin/env node
 
-import { Keypair, Connection, clusterApiUrl, PublicKey, LAMPORTS_PER_SOL } from "@solana/web3.js";
-import * as anchor from "@coral-xyz/anchor";
+import {
+  Keypair,
+  Connection,
+  clusterApiUrl,
+  PublicKey,
+  LAMPORTS_PER_SOL,
+} from "@solana/web3.js";
 import { readFileSync } from "fs";
 import { resolve } from "path";
 import BN from "bn.js";
-import { A2AClient, connectToDevnet, walletFromKeypair, escrowStatusToString } from "@a2a-pay/sdk";
+import {
+  A2AClient,
+  connectToDevnet,
+  walletFromKeypair,
+  escrowStatusToString,
+} from "@a2a-pay/sdk";
 
 function loadKeypair(): Keypair {
   const keypairPath = resolve(
@@ -29,11 +39,7 @@ async function register(serviceType: string, price: string, endpoint: string) {
   console.log(`  Endpoint: ${endpoint}`);
   console.log(`  Owner: ${client.wallet.toBase58()}`);
 
-  const tx = await client.registerService(
-    serviceType,
-    new BN(price),
-    endpoint
-  );
+  const tx = await client.registerService(serviceType, new BN(price), endpoint);
   console.log(`\nRegistered! TX: ${tx}`);
 }
 
@@ -66,24 +72,46 @@ async function discover(serviceType?: string) {
 async function pay(providerKey: string, serviceType: string, amount: string) {
   const client = getClient();
   const provider = new PublicKey(providerKey);
+  const nonce = new BN(Date.now());
 
   console.log(`Creating escrow payment...`);
   console.log(`  Provider: ${provider.toBase58()}`);
   console.log(`  Service:  ${serviceType}`);
   console.log(`  Amount:   ${amount} lamports`);
 
-  const tx = await client.createEscrow(provider, serviceType, new BN(amount));
+  const tx = await client.createEscrow(
+    provider,
+    serviceType,
+    new BN(amount),
+    nonce
+  );
   console.log(`\nEscrow created! TX: ${tx}`);
 
-  const escrowPDA = A2AClient.getEscrowPDA(client.wallet, provider, serviceType);
+  const escrowPDA = A2AClient.getEscrowPDA(
+    client.wallet,
+    provider,
+    serviceType,
+    nonce
+  );
   console.log(`Escrow PDA: ${escrowPDA.toBase58()}`);
+  console.log(`Nonce: ${nonce.toString()}`);
 }
 
-async function status(providerKey: string, serviceType: string) {
+async function status(
+  providerKey: string,
+  serviceType: string,
+  nonceRaw: string
+) {
   const client = getClient();
   const provider = new PublicKey(providerKey);
+  const nonce = new BN(nonceRaw);
 
-  const escrow = await client.getEscrow(client.wallet, provider, serviceType);
+  const escrow = await client.getEscrow(
+    client.wallet,
+    provider,
+    serviceType,
+    nonce
+  );
   if (!escrow) {
     console.log("Escrow not found.");
     return;
@@ -113,7 +141,9 @@ async function main() {
     switch (command) {
       case "register":
         if (args.length < 4) {
-          console.log("Usage: a2a-pay register <service_type> <price> <endpoint>");
+          console.log(
+            "Usage: a2a-pay register <service_type> <price> <endpoint>"
+          );
           process.exit(1);
         }
         await register(args[1], args[2], args[3]);
@@ -125,18 +155,22 @@ async function main() {
 
       case "pay":
         if (args.length < 4) {
-          console.log("Usage: a2a-pay pay <provider_pubkey> <service_type> <amount>");
+          console.log(
+            "Usage: a2a-pay pay <provider_pubkey> <service_type> <amount>"
+          );
           process.exit(1);
         }
         await pay(args[1], args[2], args[3]);
         break;
 
       case "status":
-        if (args.length < 3) {
-          console.log("Usage: a2a-pay status <provider_pubkey> <service_type>");
+        if (args.length < 4) {
+          console.log(
+            "Usage: a2a-pay status <provider_pubkey> <service_type> <nonce>"
+          );
           process.exit(1);
         }
-        await status(args[1], args[2]);
+        await status(args[1], args[2], args[3]);
         break;
 
       case "balance":
@@ -146,11 +180,21 @@ async function main() {
       default:
         console.log("A2A Pay CLI - Agent-to-Agent Payment Protocol\n");
         console.log("Commands:");
-        console.log("  register <service_type> <price> <endpoint>  Register a service");
-        console.log("  discover [service_type]                     Find services");
-        console.log("  pay <provider> <service_type> <amount>      Create escrow payment");
-        console.log("  status <provider> <service_type>            Check escrow status");
-        console.log("  balance                                     Show wallet balance");
+        console.log(
+          "  register <service_type> <price> <endpoint>  Register a service"
+        );
+        console.log(
+          "  discover [service_type]                     Find services"
+        );
+        console.log(
+          "  pay <provider> <service_type> <amount>      Create escrow payment"
+        );
+        console.log(
+          "  status <provider> <service_type> <nonce>    Check escrow status"
+        );
+        console.log(
+          "  balance                                     Show wallet balance"
+        );
         break;
     }
   } catch (err: any) {

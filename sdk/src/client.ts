@@ -21,7 +21,10 @@ export class A2AClient {
 
   constructor(provider: anchor.AnchorProvider) {
     this.provider = provider;
-    this.registryProgram = new anchor.Program(registryIdl as anchor.Idl, provider);
+    this.registryProgram = new anchor.Program(
+      registryIdl as anchor.Idl,
+      provider
+    );
     this.escrowProgram = new anchor.Program(escrowIdl as anchor.Idl, provider);
   }
 
@@ -91,9 +94,9 @@ export class A2AClient {
       REGISTRY_PROGRAM_ID
     );
     try {
-      const account = await (this.registryProgram.account as any).serviceAccount.fetch(
-        serviceAccount
-      );
+      const account = await (
+        this.registryProgram.account as any
+      ).serviceAccount.fetch(serviceAccount);
       return account as ServiceAccount;
     } catch {
       return null;
@@ -117,8 +120,9 @@ export class A2AClient {
       });
     }
 
-    const accounts =
-      await (this.registryProgram.account as any).serviceAccount.all(filters);
+    const accounts = await (
+      this.registryProgram.account as any
+    ).serviceAccount.all(filters);
 
     return accounts
       .map((a: any) => a.account as ServiceAccount)
@@ -130,11 +134,24 @@ export class A2AClient {
   async createEscrow(
     provider: PublicKey,
     serviceType: string,
-    amount: BN
+    amount: BN,
+    nonce: BN
   ): Promise<string> {
+    const [escrowAccount] = PublicKey.findProgramAddressSync(
+      [
+        Buffer.from("escrow"),
+        this.provider.wallet.publicKey.toBuffer(),
+        provider.toBuffer(),
+        Buffer.from(serviceType),
+        nonce.toArrayLike(Buffer, "le", 8),
+      ],
+      ESCROW_PROGRAM_ID
+    );
+
     const tx = await this.escrowProgram.methods
-      .createEscrow(serviceType, amount)
+      .createEscrow(serviceType, amount, nonce)
       .accounts({
+        escrowAccount,
         client: this.provider.wallet.publicKey,
         provider,
       })
@@ -144,7 +161,8 @@ export class A2AClient {
 
   async completeService(
     client: PublicKey,
-    serviceType: string
+    serviceType: string,
+    nonce: BN
   ): Promise<string> {
     const [escrowAccount] = PublicKey.findProgramAddressSync(
       [
@@ -152,6 +170,7 @@ export class A2AClient {
         client.toBuffer(),
         this.provider.wallet.publicKey.toBuffer(),
         Buffer.from(serviceType),
+        nonce.toArrayLike(Buffer, "le", 8),
       ],
       ESCROW_PROGRAM_ID
     );
@@ -168,7 +187,8 @@ export class A2AClient {
 
   async releasePayment(
     provider: PublicKey,
-    serviceType: string
+    serviceType: string,
+    nonce: BN
   ): Promise<string> {
     const [escrowAccount] = PublicKey.findProgramAddressSync(
       [
@@ -176,6 +196,7 @@ export class A2AClient {
         this.provider.wallet.publicKey.toBuffer(),
         provider.toBuffer(),
         Buffer.from(serviceType),
+        nonce.toArrayLike(Buffer, "le", 8),
       ],
       ESCROW_PROGRAM_ID
     );
@@ -194,7 +215,8 @@ export class A2AClient {
   async getEscrow(
     client: PublicKey,
     provider: PublicKey,
-    serviceType: string
+    serviceType: string,
+    nonce: BN
   ): Promise<EscrowAccount | null> {
     const [escrowAccount] = PublicKey.findProgramAddressSync(
       [
@@ -202,13 +224,14 @@ export class A2AClient {
         client.toBuffer(),
         provider.toBuffer(),
         Buffer.from(serviceType),
+        nonce.toArrayLike(Buffer, "le", 8),
       ],
       ESCROW_PROGRAM_ID
     );
     try {
-      const account = await (this.escrowProgram.account as any).escrowAccount.fetch(
-        escrowAccount
-      );
+      const account = await (
+        this.escrowProgram.account as any
+      ).escrowAccount.fetch(escrowAccount);
       return account as EscrowAccount;
     } catch {
       return null;
@@ -236,7 +259,8 @@ export class A2AClient {
   static getEscrowPDA(
     client: PublicKey,
     provider: PublicKey,
-    serviceType: string
+    serviceType: string,
+    nonce: BN
   ): PublicKey {
     const [pda] = PublicKey.findProgramAddressSync(
       [
@@ -244,6 +268,7 @@ export class A2AClient {
         client.toBuffer(),
         provider.toBuffer(),
         Buffer.from(serviceType),
+        nonce.toArrayLike(Buffer, "le", 8),
       ],
       ESCROW_PROGRAM_ID
     );

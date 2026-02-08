@@ -11,6 +11,7 @@ pub mod escrow {
         ctx: Context<CreateEscrow>,
         service_type: String,
         amount: u64,
+        nonce: u64,
     ) -> Result<()> {
         require!(service_type.len() <= 32, EscrowError::ServiceTypeTooLong);
         require!(amount > 0, EscrowError::InvalidAmount);
@@ -33,6 +34,7 @@ pub mod escrow {
         escrow.amount = amount;
         escrow.status = EscrowStatus::Created;
         escrow.service_type = service_type;
+        escrow.nonce = nonce;
         escrow.created_at = Clock::get()?.unix_timestamp;
 
         msg!(
@@ -117,7 +119,7 @@ pub mod escrow {
 // -- Accounts structs --
 
 #[derive(Accounts)]
-#[instruction(service_type: String)]
+#[instruction(service_type: String, amount: u64, nonce: u64)]
 pub struct CreateEscrow<'info> {
     #[account(
         init,
@@ -128,6 +130,7 @@ pub struct CreateEscrow<'info> {
             client.key().as_ref(),
             provider.key().as_ref(),
             service_type.as_bytes(),
+            nonce.to_le_bytes().as_ref(),
         ],
         bump,
     )]
@@ -149,6 +152,7 @@ pub struct ProviderAction<'info> {
             escrow_account.client.as_ref(),
             provider.key().as_ref(),
             escrow_account.service_type.as_bytes(),
+            escrow_account.nonce.to_le_bytes().as_ref(),
         ],
         bump,
     )]
@@ -167,6 +171,7 @@ pub struct ClientAction<'info> {
             client.key().as_ref(),
             escrow_account.provider.as_ref(),
             escrow_account.service_type.as_bytes(),
+            escrow_account.nonce.to_le_bytes().as_ref(),
         ],
         bump,
     )]
@@ -187,6 +192,7 @@ pub struct EscrowAccount {
     pub amount: u64,
     pub status: EscrowStatus,
     pub service_type: String,
+    pub nonce: u64,
     pub created_at: i64,
 }
 
@@ -198,6 +204,7 @@ impl EscrowAccount {
         + 8   // amount
         + 1   // status (enum)
         + 4 + service_type.len() // service_type
+        + 8   // nonce
         + 8   // created_at
     }
 }

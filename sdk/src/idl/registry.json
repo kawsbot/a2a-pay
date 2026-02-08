@@ -8,6 +8,58 @@
   },
   "instructions": [
     {
+      "name": "close_service",
+      "discriminator": [
+        243,
+        233,
+        131,
+        135,
+        145,
+        47,
+        57,
+        20
+      ],
+      "accounts": [
+        {
+          "name": "service_account",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  115,
+                  101,
+                  114,
+                  118,
+                  105,
+                  99,
+                  101
+                ]
+              },
+              {
+                "kind": "account",
+                "path": "owner"
+              },
+              {
+                "kind": "account",
+                "path": "service_account.service_type",
+                "account": "ServiceAccount"
+              }
+            ]
+          }
+        },
+        {
+          "name": "owner",
+          "signer": true,
+          "relations": [
+            "service_account"
+          ]
+        }
+      ],
+      "args": []
+    },
+    {
       "name": "deactivate_service",
       "discriminator": [
         251,
@@ -221,6 +273,11 @@
       "code": 6002,
       "name": "InvalidPrice",
       "msg": "Price must be greater than zero"
+    },
+    {
+      "code": 6003,
+      "name": "ServiceStillActive",
+      "msg": "Service must be deactivated before closing"
     }
   ],
   "types": [

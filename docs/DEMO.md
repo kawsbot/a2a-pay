@@ -38,7 +38,7 @@ The provider agent registers an "echo" service on-chain:
 The client agent:
 - Queries the registry for `echo` services
 - Selects the cheapest provider
-- Creates an escrow with the listed price (SOL locked on-chain)
+- Creates an escrow with the listed price and a unique nonce (SOL locked on-chain)
 
 ### Step 3: Provider Completes Service
 The provider agent:
@@ -69,7 +69,7 @@ npm run cli -- register echo 500000 https://kawsbot.dev/api/echo
 npm run cli -- discover echo
 npm run cli -- balance
 npm run cli -- pay <PROVIDER_PUBKEY> echo 500000
-npm run cli -- status <PROVIDER_PUBKEY> echo
+npm run cli -- status <PROVIDER_PUBKEY> echo <NONCE>
 ```
 
 ## Expected Output
